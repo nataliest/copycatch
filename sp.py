@@ -80,7 +80,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     conf = SparkConf()
-    conf.setMaster("spark://10.0.0.6:7077")
+    conf.setMaster("spark://10.0.0.12:7077")
     conf.setAppName("CopyCatch")
     conf.set("spark.executor.memory", "1000m")
     conf.set("spark.executor.cores", "2")
@@ -88,6 +88,7 @@ if __name__ == "__main__":
     conf.set("spark.driver.memory", "5000m")
 
     sc = SparkContext(conf = conf)
+    sc.setLogLevel("ERROR")
     print('\n\n\n\n\n================================\n\n\n')
     img_list = list(img_list)
     dataRDD = sc.parallelize(img_list, len(img_list)//100 )
