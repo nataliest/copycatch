@@ -46,19 +46,18 @@ if __name__ == "__main__":
     r_incoming_tags = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=3)
     r_tags = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=1)
     r_tag_levels = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=2)
-    
+    r_labels = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=4)    
 
-    incoming_img_same = '000013ba71c12506'
-    incoming_img_same = '0bd24be55bcff9eb'
-
-    incoming_img_tags = ['/m/05s2s', '/m/07j7r', '/m/0d4v4']
     incoming_img_tags = r_incoming_tags.smembers(incoming_img_id)
     print("\n\n\nGOT TAGS FOR INCOMING IMAGE:", incoming_img_id)
-    print(incoming_img_tags)
+    labels_list = []
+    for i in list(incoming_img_tags):
+        labels_list.append(r_labels.get(i))
+    print(labels_list)
     print("\n\n\n")
     # incoming_img_tags = get_tags_for_incoming(image_id = incoming_img_id)
     img_list = get_img_id_list(incoming_img_tags, r_tags, r_tag_levels)
-    print("\n\nFiltered image ids in {} seconds. Getting images from S3...\n\n\n".format(time.time()-start_time))
+    print("\n\nFiltered image ids in {} seconds. Getting incoming image from S3...\n\n\n".format(time.time()-start_time))
     start_time = time.time() 
 
 
@@ -76,7 +75,7 @@ if __name__ == "__main__":
 
     timepoint = time.time() - start_time
 
-    print("\n\nFetched images and tags in {} seconds\n\n".format(timepoint))
+    print("\n\nFetched incoming image in {} seconds\n\nStarting Spark.....\n\n\n".format(timepoint))
     start_time = time.time()
 
     conf = SparkConf()
@@ -89,7 +88,7 @@ if __name__ == "__main__":
 
     sc = SparkContext(conf = conf)
     sc.setLogLevel("ERROR")
-    print('\n\n\n\n\n================================\n\n\n')
+   # print('\n\n\n\n\n================================\n\n\n')
     img_list = list(img_list)
     dataRDD = sc.parallelize(img_list, len(img_list)//100 )
    
@@ -98,7 +97,7 @@ if __name__ == "__main__":
 #    rdd = rdd.filter(lambda x: compare_images(incoming_im_resized, x))
     
     result = rdd.take(1)
-    print("\n\n=========\n",result,"\n\n\n")
+   # print("\n\n=========\n",result,"\n\n\n")
     print("Spark finished in {} seconds".format(time.time() - start_time))
     
     if result == []:
