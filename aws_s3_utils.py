@@ -11,7 +11,7 @@ def load_from_S3(image_id=None, image_size=(128,128), b=None, aws_connection=Non
     size = None
 
    # b_incoming = c.get_bucket('open-images-bucket')
-    b = aws_connection.get_bucket(bucket_name)
+    b = aws_connection.get_bucket(bucket_name, validate=False)
     # possible folders in the S3 bucket
     prefix = ['', 'train/', 'test']
     for p in prefix:

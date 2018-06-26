@@ -65,8 +65,8 @@ if __name__ == "__main__":
    
     # connect to S3 bucket
     c = boto.connect_s3()
-    b_incoming = c.get_bucket(incoming_bucket)
-    b = c.get_bucket(main_bucket)
+    b_incoming = c.get_bucket(incoming_bucket, validate=False)
+    b = c.get_bucket(main_bucket, validate=False)
 
 
     incoming_im_resized = load_from_S3(image_id=incoming_img_id, image_size=new_size, b=b_incoming, aws_connection=c, bucket_name=incoming_bucket)
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     conf.setMaster("spark://10.0.0.6:7077")
     conf.setAppName("CopyCatch")
     conf.set("spark.executor.memory", "1000m")
-    conf.set("spark.executor.cores", "1")
+    conf.set("spark.executor.cores", "2")
     conf.set("spark.executor.instances", "15")
     conf.set("spark.driver.memory", "5000m")
 
@@ -110,35 +110,3 @@ if __name__ == "__main__":
        #     print("\n\nKeeping the old image.\n\n")
 
 
-
-'''
-
-# S3 imports
-import boto
-from boto.s3.key import Key
-from boto.exception import S3ResponseError
-import io
-import PIL
-from PIL import Image
-
-def load_from_S3(image_id=None, image_size=(128,128), b=None):
-    img = None
-    size = None
-    
-    # possible folders in the S3 bucket
-    prefix = ['','test/', 'train/']
-    for p in prefix:
-        k = Key(b)
-        k.key = '{}{}.jpg'.format(p, image_id)
-        try:
-            s = k.get_contents_as_string()
-            img = Image.open(io.BytesIO(s))
-            size = img.size
-            img = img.resize(image_size)
-            # print("found", size)
-            return img, size, image_id
-        except S3ResponseError:
-            # print("no img in ", p)
-            pass
-return img, size, image_id
-'''
