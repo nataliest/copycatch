@@ -2,14 +2,11 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    
-    <title>CopyCatcher Homepage</title>
+    <title>Semantic UI CDN</title>
 <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
--->   
+-->  
   <link rel="stylesheet" type="text/css" href="../static/js/dist/components/reset.css">
   <link rel="stylesheet" type="text/css" href="../static/js/dist/components/site.css">
 
@@ -34,7 +31,7 @@
     }
 
     .masthead.segment {
-      min-height: 600px;
+      min-height: 700px;
       padding: 1em 0em;
     }
     .masthead .logo.item img {
@@ -48,38 +45,10 @@
       margin-bottom: 0em;
       font-size: 4em;
       font-weight: normal;
-      
     }
-
-    .masthead h1.ui.header.cc-icon {
-      margin-top: 2em;
-      margin-bottom: 0em;
-      font-size: 3em;
-      font-weight: normal;
-
-    }
-
-    .masthead h2.ui.header {
-      margin-top: 1em;
-      margin-bottom: 1em;
-      font-size: 2em;
-      font-weight: normal;
-
-    }
-
-    .masthead h1.ui.header.cc-title {
-      margin-top: 0em;
-      margin-bottom: 0.5em;
-      font-size: 4em;
-      font-weight: normal;
-      display: inline-block;
-
-    }
-
     .masthead h2 {
       font-size: 1.7em;
       font-weight: normal;
-      margin-bottom: 0em;
     }
 
     .ui.vertical.stripe {
@@ -111,7 +80,7 @@
     }
 
     .footer.segment {
-      padding: 2em 0em;
+      padding: 5em 0em;
     }
 
     .secondary.pointing.menu .toc.item {
@@ -174,10 +143,10 @@
     })
   ;
   </script>
+
 </head>
 <body>
-
-<!--
+<!-- Following Menu -->
 <div class="ui large top fixed hidden menu">
   <div class="ui container">
     <a class="active item">Home</a>
@@ -187,7 +156,7 @@
     </div>
 </div>
 
-
+<!-- Sidebar Menu -->
 <div class="ui vertical inverted sidebar menu">
   <a class="active item">Home</a>
   <a class="item">Results</a>
@@ -195,9 +164,6 @@
   <a class="item">About Me</a>
 
 </div>
-
--->
-<!-- Page Contents -->
 <div class="pusher">
   <div class="ui inverted vertical masthead center aligned segment">
 
@@ -206,66 +172,40 @@
         <a class="toc item">
           <i class="sidebar icon"></i>
         </a>
-        <a class="active item">Home</a>
-        <a class="item" href="\stats">Results</a>
+        <a class="item" href="\">Home</a>
+        <a class="active item" href="\stats">Results</a>
         <a class="item">Technologies</a>
         <a class="item">About Me</a>
      </div>
     </div>
 
     <div class="ui text container">
-      <h1 class="ui inverted olive header cc-icon"> <i class="object group outline icon"></i>
-</h1>
-      <h1 class="ui inverted olive header cc-title">
-        C
-      </h1>
-      <h1 class="ui inverted header cc-title">
-        opy
-      </h1>
-      <h1 class="ui inverted olive header cc-title">
-        C
-      </h1>
-      <h1 class="ui inverted header cc-title">
-        atcher       </h1>
-
-      <h2 class="ui inverted header">Efficient copy finder for large datasets.</h2>
-      <button class="ui huge inverted olive button" type="button" onclick="window.location.href='/stats';">
-             Display Results
-      <i class="arrow circle right icon"></i>
-      </button>
-
-    </div>
- </div>
-
-<!--  <div class="ui vertical stripe segment">
-    <div class="ui middle aligned stackable grid container">
-      <div class="row">
-        <div class="eight wide column">
-          <h3 class="ui header">We Help Companies and Companions</h3>
-          <p>We can give your company superpowers to do things that they never thought possible. Let us delight your customers and empower your needs...through pure data analytics.</p>
-          <h3 class="ui header">We Make Bananas That Can Dance</h3>
-          <p>Yes that's right, you thought it was the stuff of dreams, but even bananas can be bioengineered.</p>
-        </div>
-        <div class="eight wide right column">
-          <img src="assets/images/wireframe/white-image.png" class="ui large bordered rounded image">
-        </div>
+      <h2 class="ui inverted header">
+        Results
+      </h2>
       </div>
-      <div class="row">
-        <div class="center aligned column">
-          <a class="ui huge button">Check Them Out</a>
-        </div>
-      </div>
-    </div>
-  </div> -->
-<div class="ui inverted vertical footer segment">
-         <h5 class="ui horizontal white header divider">Designed and implemented by Natalie Lebedeva</h5>
+                   <table class="ui unstackable table">
+                     <thead>
+                       <tr>
+                         <th>Tag</th>
+			 <th>Label</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {% for val in list_out %}
+                       <tr>
+                         <td><a href="stats/{{val.Key[3:]}}">{{val.Key}}</a></td>
+			 <td>{{val.val}}</td>
+                       </tr>
+                       {% endfor %}
+                     </tbody>
+                   </table>
 
 
-   <div class="ui center aligned container">
-        <p>Insight Data Science 2018 | Data Engineering Fellowship</p>
-   </div>   
+  </div>
 </div>
-
-</div>
+    
 </body>
 </html>
+
+

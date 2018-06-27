@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-	return render_template("main.html")
+	return render_template("index.html")
 
 @app.route('/stats/<id>')
 def display_detailed_info(id):
@@ -25,7 +25,7 @@ def hello_world():
 	for key in not_all_keys:
 		out.append({"Key": key, "val": r.get(key)})
 	
-	return render_template("index.html", list_out=out)
+	return render_template("stats.html", list_out=out)
 
 if __name__ == '__main__':
 	app.run()
