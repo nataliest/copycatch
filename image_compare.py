@@ -22,7 +22,7 @@ def compare_images(
     same_size_MSE_cutoff=0.6,
     diff_size_MSE_cutoff=1000):
     
-    if existing[0] == None:
+    if not isinstance(existing[0], np.ndarray) :
         return False
     
     existing_im = incoming[0]
@@ -50,8 +50,10 @@ def compare_images(
     #     new_size = shape_existing
     #     print(new_size)
     
-    existing_im_array = np.asarray(existing_im)
-    incoming_im_array = np.asarray(incoming_im)
+   # existing_im_array = np.asarray(existing_im)
+   # incoming_im_array = np.asarray(incoming_im)
+    existing_im_array = existing_im
+    incoming_im_array = incoming_im
     if np.shape(existing_im_array) != np.shape(incoming_im_array):
         return False      
     images_MSE = mse(existing_im_array, incoming_im_array)

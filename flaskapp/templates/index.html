@@ -1,0 +1,17 @@
+<a href="\" style="text-align:left;font-size=3em;color=green;"> DB </a>
+                   <table>
+                     <thead>
+                       <tr>
+                         <th style="text-align:left">Tag</th>
+			 <th style="text-align:left">Label</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {% for val in list_out %}
+                       <tr>
+                         <td><a href="stats/{{val.Key[3:]}}">{{val.Key}}</a></td>
+			 <td>{{val.val}}</td>
+                       </tr>
+                       {% endfor %}
+                     </tbody>
+                   </table>
