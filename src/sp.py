@@ -58,10 +58,10 @@ if __name__ == "__main__":
     r_tag_levels = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=2)
     r_labels = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=4)    
 
-    incoming_img_tags = r_incoming_tags.smembers(incoming_img_id)
+    incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id))
     print("\n\n\nGOT TAGS FOR INCOMING IMAGE:", incoming_img_id)
     labels_list = []
-    for i in list(incoming_img_tags):
+    for i in incoming_img_tags:
         labels_list.append(r_labels.get(i))
     print(labels_list)
     print("\n\n\n")
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     start_time = time.time() 
 
 
-    incoming_im_resized = load_from_S3(ak=awsak, sk=awssk, image_id=incoming_img_id, image_size=new_size, b=b_incoming, aws_connection=c, bucket_name='small-open-images-bucket')
+    incoming_im_resized = load_from_S3(ak=awsak, sk=awssk, image_id=incoming_img_id, image_size=new_size,  bucket_name='small-open-images-bucket')
     if not isinstance(incoming_im_resized[0], np.ndarray):
         print(incoming_im_resized)
         print("\n\n\nIncoming image is NULL\n\n\n")
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     dataRDD = sc.parallelize(img_list, partition)
 
     mult = not grayscale
-    rdd = dataRDD.map(lambda x: load_from_S3(gs=grayscale, ak=awsak, sk=awssk, image_id=x, image_size=new_size, b=b, aws_connection=c, bucket_name=main_bucket))
+    rdd = dataRDD.map(lambda x: load_from_S3(gs=grayscale, ak=awsak, sk=awssk, image_id=x, image_size=new_size,  bucket_name=main_bucket))
     rdd = rdd.filter(lambda y: is_not_none(y[0]))
     rdd = rdd.filter(lambda x: compare_images(incoming_im_resized, x))
     result = rdd.take(1)
@@ -121,8 +121,8 @@ if __name__ == "__main__":
     
     if result == []:
         print("\n\n\n\n\nNo match found, adding to the db...\n\n")
-        add = input("Would you like to add the image to the db?")
-        if add:
+        add = input("Would you like to add the image to the db? y/n")
+        if add.lower() == 'y':
             # connect to S3 bucket
             c = boto.connect_s3()
             src = c.get_bucket(incoming_bucket, validate=False)
@@ -131,7 +131,8 @@ if __name__ == "__main__":
             k_src.key = "{}.jpg".format(incoming_img_id)
             k_dst = Key(dst)
             k_dst.key = "valid/img{}.jpg".format(incoming_img_id)
-            dst.copy_key(k_src.key, src.name, k_dst.key)    
+            dst.copy_key(k_src.key, src.name, k_dst.key) 
+            update_db(incoming_img_tags, "img{}.jpg".format(incoming_img_id))    
     else:
         print("\n\n\n\n\nDuplicate found...\n\n")
 
