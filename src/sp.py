@@ -81,7 +81,7 @@ if __name__ == "__main__":
     if len(np.shape(incoming_im_resized[0])) < 3:
         grayscale = True
     timepoint = time.time() - start_time
-    print(type(incoming_im_resized))
+    
     print("\n\nFetched incoming image in {} seconds\n\nStarting Spark.....\n\n\n".format(timepoint))
     start_time = time.time()
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     img_list = list(img_list)
     num_ids = len(img_list)
-    partition = 1
+    partition = 0
     if num_ids > 100000:
         partition = 10000
     elif num_ids > 10000:
@@ -112,27 +112,27 @@ if __name__ == "__main__":
     dataRDD = sc.parallelize(img_list, partition)
 
     mult = not grayscale
-    rdd = dataRDD.map(lambda x: load_from_S3(gs=grayscale, ak=awsak, sk=awssk, image_id=x, image_size=new_size,  bucket_name=main_bucket))
-    rdd = rdd.filter(lambda y: is_not_none(y[0]))
-    rdd = rdd.filter(lambda x: compare_images(incoming_im_resized, x))
+    rdd = dataRDD.map(lambda x: load_from_S3(gs=grayscale, ak=awsak, sk=awssk, image_id=x, image_size=new_size,  bucket_name=main_bucket)).filter(lambda x: compare_images(incoming_im_resized, x))
+#    rdd = rdd.filter(lambda y: is_not_none(y[0]))
+#    rdd = rdd.filter(lambda x: compare_images(incoming_im_resized, x))
     result = rdd.take(1)
- 
+     
     print("Spark finished in {} seconds".format(time.time() - start_time))
     
     if result == []:
         print("\n\n\n\n\nNo match found, adding to the db...\n\n")
-        add = input("Would you like to add the image to the db? y/n")
-        if add.lower() == 'y':
+        print("Adding to the database..")
             # connect to S3 bucket
-            c = boto.connect_s3()
-            src = c.get_bucket(incoming_bucket, validate=False)
-            dst = c.get_bucket(main_bucket, validate=False)
-            k_src = Key(src)
-            k_src.key = "{}.jpg".format(incoming_img_id)
-            k_dst = Key(dst)
-            k_dst.key = "valid/img{}.jpg".format(incoming_img_id)
-            dst.copy_key(k_src.key, src.name, k_dst.key) 
-            update_db(incoming_img_tags, "img{}.jpg".format(incoming_img_id))    
+        c = boto.connect_s3()
+        src = c.get_bucket('small-open-images-bucket', validate=False)
+        dst = c.get_bucket(main_bucket, validate=False)
+        k_src = Key(src)
+        k_src.key = "{}.jpg".format(incoming_img_id)
+        k_dst = Key(dst)
+        k_dst.key = "valid/img{}.jpg".format(incoming_img_id)
+        dst.copy_key(k_dst.key, src.name, k_src.key) 
+        print("Updating tags database..")
+        update_db(incoming_img_tags, "img{}.jpg".format(incoming_img_id), r_tags)    
     else:
         print("\n\n\n\n\nDuplicate found...\n\n")
 

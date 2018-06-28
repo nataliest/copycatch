@@ -14,7 +14,7 @@ def load_from_S3(image_id=None, image_size=(128,128), b=None, aws_connection=Non
 
     b = aws_connection.get_bucket(bucket_name, validate=False)
     # possible folders in the S3 bucket
-    prefix = ['', 'train/', 'test', 'valid']
+    prefix = ['', 'train/', 'test/', 'valid/']
     for p in prefix:
         k = Key(b)
         k.key = '{}{}.jpg'.format(p, image_id)

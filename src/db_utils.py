@@ -6,7 +6,7 @@ def update_db(incoming_img_tags, id, r_tags):
         r_tags.sadd(tag, id)
 
 def get_img_id_list(incoming_img_tags, r_tags, r_tag_levels):
-    tags = list(sort_by_level(incoming_img_tags))
+    tags = list(sort_by_level(incoming_img_tags, r_tag_levels))
     
     img_list_prev = set(r_tags.smembers(tags[0]))
     img_list_next = []
