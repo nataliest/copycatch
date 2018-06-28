@@ -28,14 +28,6 @@ from PIL import Image
 import numpy as np
 
 
-def is_not_none(arr):
-    return isinstance(arr, np.ndarray)
-
-def is_same_size(arr1, arr2):
-    if isinstance(arr1, np.ndarray) and isinstance(arr2, np.ndarray):
-        return np.shape(arr1) == np.shape(arr2)
-    else:
-        return False
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="spark-submit python file argument parser")
@@ -46,6 +38,21 @@ def parse_arguments():
     parser.add_argument('-sk', '--secret-key', dest='secret_key', type=str, default='', help='AWS secret key.')
     args = parser.parse_args()
     return vars(args)
+
+
+def get_partition_size:
+    if num_ids < 10:
+        partition = 2
+    if num_ids > 100000:
+        partition = 10000
+    elif num_ids > 10000:
+        partition = 5000
+    elif num_ids > 1000:
+        partition = 100
+    elif num_ids > 100:
+        partition = 50
+    else:
+        partition = 10
 
 if __name__ == "__main__":
 
@@ -59,9 +66,9 @@ if __name__ == "__main__":
     awsak = args['access_key']
     awssk = args['secret_key']
 
-    start_time = time.time()
-    
+    # resize images to a smaller and/or the same size
     new_size = (128, 128)
+    start_time = time.time()
     
     
     # TAGS => DB = 1
@@ -71,7 +78,7 @@ if __name__ == "__main__":
     r_tags = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=1)
     r_tag_levels = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=2)
     r_labels = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=4)    
-    
+    r_stats = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=5)
 
     incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id))
     # test
@@ -79,16 +86,17 @@ if __name__ == "__main__":
         incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id[:-2]))
    # incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id))
     print("\n\n\nGOT TAGS FOR INCOMING IMAGE:", incoming_img_id)
-    labels_list = []
+    tag_labels = ''
     for i in incoming_img_tags:
-        labels_list.append(r_labels.get(i))
-    print(labels_list)
+        tag_labels += r_labels.get(i) + ', '
+    tag_labels = [tag_labels[:-2]]
+    print(tag_labels)
     print("\n\n\n")
    
     img_list = get_img_id_list(incoming_img_tags, r_tags, r_tag_levels)
     
-    redis_time = time.time()-start_time
 
+    redis_time = time.time()-start_time
     print("Filter returned {} images".format(len(img_list)))
     print("\n\nFiltered image ids in {} seconds. Getting incoming image from S3...\n\n\n".format(redis_time))
     start_time = time.time() 
@@ -103,11 +111,9 @@ if __name__ == "__main__":
     grayscale = False
     if len(np.shape(incoming_im_resized[0])) < 3:
         grayscale = True
-    timepoint = time.time() - start_time  
 
-    
-    print("\n\nFetched incoming image in {} seconds\n\nStarting Spark.....\n\n\n".format(timepoint))
-    
+    timepoint = time.time() - start_time  
+    print("\n\nFetched incoming image in {} seconds\n\nStarting Spark.....\n\n\n".format(timepoint))    
     start_time = time.time()
 
     conf = SparkConf()
@@ -123,19 +129,8 @@ if __name__ == "__main__":
 
     img_list = list(img_list)
     num_ids = len(img_list)
-    partition = 1
-    if num_ids > 1:
-        partition = num_ids // 2
-    if num_ids > 100000:
-        partition = 10000
-    elif num_ids > 10000:
-        partition = 5000
-    elif num_ids > 1000:
-        partition = 100
-    elif num_ids > 100:
-        partition = 50
-    else:
-        partition = 10
+    partition = get_partition_size(num_ids)
+
     dataRDD = sc.parallelize(img_list, partition)
 
     mult = not grayscale
@@ -165,13 +160,11 @@ if __name__ == "__main__":
         k_dst.key = "valid/img{}.jpg".format(incoming_img_id)
         dst.copy_key(k_dst.key, src.name, k_src.key) 
         print("Updating tags database..")
-        update_db(incoming_img_tags, "img{}".format(incoming_img_id), r_tags)    
-    else:
-        print("\n\n\n\n\nDuplicate found...\n\n")
-        r_stats = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=5)
+        update_db(incoming_img_tags, "img{}".format(incoming_img_id), r_tags)  
+
+
         stats_list = []
 
-        tag_labels = str(labels_list)
         stats_list.append(tag_labels)
 
         total_img = r_tags.get('size')
@@ -180,14 +173,16 @@ if __name__ == "__main__":
         num_filtered = len(img_list)
         stats_list.append(num_filtered)
 
-        stats_list.append(redis_time)
-        stats_list.append(spark_time)
+        stats_list.append(round(redis_time, 2))
+        stats_list.append(round(spark_time, 2))
 
         tot_time = time.time() - tot_start_time
-        stats_list.append(tot_time)
+        stats_list.append(round(tot_time, 2))
+        
+        stats_list.append("Not found")
 
         ssim = compare_ssim(incoming_im_resized[0], result[0][0], multichannel=mult)
-        stats_list.append(ssim)
+        stats_list.append(str(round(ssim * 100, 2))+"%")
 
         k_src.key = "{}{}.jpg".format(incoming_im_resized[3],incoming_img_id)
         k_dst.key = "{}{}.jpg".format(result[0][3], result[0][2])
@@ -196,6 +191,42 @@ if __name__ == "__main__":
         stats_list.append(url_orig)
         stats_list.append(url_incoming)
         print(stats_list)
+        stats_list = stats_list.reverse()
+        for stat in stats_list:
+            r_stats.lpush(result[0][2], stat)
+
+    else:
+        print("\n\n\n\n\nDuplicate found...\n\n")
+        
+        stats_list = []
+
+        stats_list.append(tag_labels)
+
+        total_img = r_tags.get('size')
+        stats_list.append(total_img)
+
+        num_filtered = len(img_list)
+        stats_list.append(num_filtered)
+
+        stats_list.append(round(redis_time, 2))
+        stats_list.append(round(spark_time, 2))
+
+        tot_time = time.time() - tot_start_time
+        stats_list.append(round(tot_time, 2))
+
+        stats_list.append("Found")
+
+        ssim = compare_ssim(incoming_im_resized[0], result[0][0], multichannel=mult)
+        stats_list.append(str(round(ssim * 100, 2))+"%")
+
+        k_src.key = "{}{}.jpg".format(incoming_im_resized[3],incoming_img_id)
+        k_dst.key = "{}{}.jpg".format(result[0][3], result[0][2])
+        url_orig = k_dst.generate_url(expires_in=0, query_auth=False)
+        url_incoming = k_src.generate_url(expires_in=0, query_auth=False)
+        stats_list.append(url_orig)
+        stats_list.append(url_incoming)
+        print(stats_list)
+        stats_list = stats_list.reverse()
         for stat in stats_list:
             r_stats.lpush(result[0][2], stat)
         # id => [tags as words, total num, num filtered, redis tag retr time, spark filter time, tot time, struct sim, url original, url new]
