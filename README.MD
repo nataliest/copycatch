@@ -8,7 +8,7 @@ CopyCatcher aims to solve:
 
 After filtering almost two million images by tags in under a second, the app performs MSE-error calculation on the filtered images and the incoming image in parallel using Spark. The image metadata is stored in Redis.
 
-<img src="./docs/CopyCatcher_pipeline.jpg" alt="pipeline_pp">
+<img src="./docs/CopyCatcher_pipeline.png" alt="pipeline_pp">
 
 Dataset:
 Open Images Dataset: ~600GB of images
