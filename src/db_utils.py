@@ -16,8 +16,6 @@ def get_img_id_list(incoming_img_tags, r_tags, r_tag_levels):
         img_list_next = set(r_tags.smembers(tag))
         img_list_prev = img_list_prev.intersection(img_list_next)
         img_list_next = []
-    
-    print("Filter returned {} images".format(len(img_list_prev)))
  
     return img_list_prev
 

@@ -24,10 +24,10 @@ def load_from_S3(image_id=None, image_size=(128,128), b=None, aws_connection=Non
             size = img.size
             img = np.asarray(img.resize(image_size))
             if not gs and len(np.shape(img)) < 3:
-                return None, None, image_id
+                return None, None, image_id, p
             aws_connection.close()
-            return img, size, image_id
+            return img, size, image_id, p
         except S3ResponseError:
             pass
     aws_connection.close()
-    return img, size, image_id
+    return img, size, image_id, ''
