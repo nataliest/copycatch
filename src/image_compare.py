@@ -32,26 +32,7 @@ def compare_images(
     shape_incoming = incoming[1]
     same_size = shape_existing == shape_incoming
     
-#    if shape_existing[0] / shape_existing[1] != shape_incoming[0] / shape_incoming[1]:
-#        print("Image is new, add image to the DB")
-       #add_img_s3(from_bucket, to_bucket, incoming[2])
-       #check if exists, delete first
-#        return False
-#    else:
-#        pass
-    
-    # REPLACE IM SCRIPT
-    #     replace_im = False
-    #     if shape_existing[0] > shape_incoming[0] and shape_existing[1] < shape_incoming[1]:
-    #         replace_im = True
-    
-    #     new_size = shape_incoming
-    # else:
-    #     new_size = shape_existing
-    #     print(new_size)
-    
-   # existing_im_array = np.asarray(existing_im)
-   # incoming_im_array = np.asarray(incoming_im)
+
     existing_im_array = existing_im
     incoming_im_array = incoming_im
     if np.shape(existing_im_array) != np.shape(incoming_im_array):

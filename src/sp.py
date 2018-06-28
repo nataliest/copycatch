@@ -65,18 +65,11 @@ if __name__ == "__main__":
         labels_list.append(r_labels.get(i))
     print(labels_list)
     print("\n\n\n")
-    # incoming_img_tags = get_tags_for_incoming(image_id = incoming_img_id)
+   
     img_list = get_img_id_list(incoming_img_tags, r_tags, r_tag_levels)
     print("\n\nFiltered image ids in {} seconds. Getting incoming image from S3...\n\n\n".format(time.time()-start_time))
     start_time = time.time() 
 
-
-   
-    # connect to S3 bucket
-#    c = boto.connect_s3()
-#    b_incoming = c.get_bucket(incoming_bucket, validate=False)
-#    b = c.get_bucket(main_bucket, validate=False)
-    c, b_incoming, b = '', '', ''
 
     incoming_im_resized = load_from_S3(ak=awsak, sk=awssk, image_id=incoming_img_id, image_size=new_size, b=b_incoming, aws_connection=c, bucket_name='small-open-images-bucket')
     if not isinstance(incoming_im_resized[0], np.ndarray):
@@ -102,7 +95,7 @@ if __name__ == "__main__":
 
     sc = SparkContext(conf = conf)
     sc.setLogLevel("ERROR")
-   # print('\n\n\n\n\n================================\n\n\n')
+
     img_list = list(img_list)
     num_ids = len(img_list)
     partition = 1
@@ -117,36 +110,30 @@ if __name__ == "__main__":
     else:
         partition = 10
     dataRDD = sc.parallelize(img_list, partition)
-    print(incoming_im_resized)   
-    print(np.shape(incoming_im_resized[0]))
+
     mult = not grayscale
-    print(mult)        
-#    rdd = dataRDD.map(lambda x: load_from_S3(gs=grayscale, ak=awsak, sk=awssk, image_id=x, image_size=new_size, b=b, aws_connection=c, bucket_name=main_bucket)).filter(lambda y: is_not_none(y[0])).filter(lambda y: compare_ssim(incoming_im_resized[0], y[0], multichannel=mult)>0.4).filter(lambda x: compare_images(incoming_im_resized, x))
-#    rdd = dataRDD.map(lambda x: load_from_S3(ak=awsak, sk=awssk, image_id=x, image_size=new_size, b=b, aws_connection=c, bucket_name=main_bucket)).filter(lambda x: compare_images(incoming_im_resized, x))
-#    rdd = rdd.filter(lambda x: compare_images(incoming_im_resized, x))
-#    rdd = dataRDD.map(lambda x: load_from_S3(gs=grayscale, ak=awsak, sk=awssk, image_id=x, image_size=new_size, b=b, aws_connection=c, bucket_name=main_bucket)).filter(lambda y: is_not_none(y[0])).filter(lambda x: compare_images(incoming_im_resized, x))
     rdd = dataRDD.map(lambda x: load_from_S3(gs=grayscale, ak=awsak, sk=awssk, image_id=x, image_size=new_size, b=b, aws_connection=c, bucket_name=main_bucket))
     rdd = rdd.filter(lambda y: is_not_none(y[0]))
     rdd = rdd.filter(lambda x: compare_images(incoming_im_resized, x))
     result = rdd.take(1)
-   # print("\n\n=========\n",result,"\n\n\n")
+ 
     print("Spark finished in {} seconds".format(time.time() - start_time))
     
     if result == []:
         print("\n\n\n\n\nNo match found, adding to the db...\n\n")
-#        add = input("Would you like to add the image to the db?")
-#        if add:
-#            src = b_incoming
-#            dst = b
-#            k = Key(src)
-#            k
-#            k.key = "valid/img{}.jpg".format(incoming_img_id)
-#            dst.copy_key(k.key, src.name, k.key)    
+        add = input("Would you like to add the image to the db?")
+        if add:
+            # connect to S3 bucket
+            c = boto.connect_s3()
+            src = c.get_bucket(incoming_bucket, validate=False)
+            dst = c.get_bucket(main_bucket, validate=False)
+            k_src = Key(src)
+            k_src.key = "{}.jpg".format(incoming_img_id)
+            k_dst = Key(dst)
+            k_dst.key = "valid/img{}.jpg".format(incoming_img_id)
+            dst.copy_key(k_src.key, src.name, k_dst.key)    
     else:
         print("\n\n\n\n\nDuplicate found...\n\n")
-       # if replace_im:
-       #     print("\n\nNew image is higher quality:\nReplacing...\n\n")
-       # else:
-       #     print("\n\nKeeping the old image.\n\n")
+
 
 

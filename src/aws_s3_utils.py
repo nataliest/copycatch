@@ -11,10 +11,10 @@ def load_from_S3(image_id=None, image_size=(128,128), b=None, aws_connection=Non
     img = None
     size = None
     aws_connection = boto.connect_s3(aws_access_key_id=ak, aws_secret_access_key=sk)
-   # b_incoming = c.get_bucket('open-images-bucket')
+
     b = aws_connection.get_bucket(bucket_name, validate=False)
     # possible folders in the S3 bucket
-    prefix = ['', 'train/', 'test']
+    prefix = ['', 'train/', 'test', 'valid']
     for p in prefix:
         k = Key(b)
         k.key = '{}{}.jpg'.format(p, image_id)
