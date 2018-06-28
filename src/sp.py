@@ -29,10 +29,13 @@ import numpy as np
 
 
 def is_not_none(arr):
-    if not isinstance(arr, np.ndarray):
-        return False
+    return isinstance(arr, np.ndarray)
+
+def is_same_size(arr1, arr2):
+    if isinstance(arr1, np.ndarray) and isinstance(arr2, np.ndarray):
+        return np.shape(arr1) == np.shape(arr2)
     else:
-        return True
+        return False
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="spark-submit python file argument parser")
@@ -68,8 +71,13 @@ if __name__ == "__main__":
     r_tags = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=1)
     r_tag_levels = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=2)
     r_labels = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=4)    
+    
 
     incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id))
+    # test
+    if incoming_img_id[-2:] == 'wm':
+        incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id[:-2]))
+   # incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id))
     print("\n\n\nGOT TAGS FOR INCOMING IMAGE:", incoming_img_id)
     labels_list = []
     for i in incoming_img_tags:
@@ -115,14 +123,26 @@ if __name__ == "__main__":
 
     img_list = list(img_list)
     num_ids = len(img_list)
-    partition = num_ids // 2
-
+    partition = 1
+    if num_ids > 1:
+        partition = num_ids // 2
+    if num_ids > 100000:
+        partition = 10000
+    elif num_ids > 10000:
+        partition = 5000
+    elif num_ids > 1000:
+        partition = 100
+    elif num_ids > 100:
+        partition = 50
+    else:
+        partition = 10
     dataRDD = sc.parallelize(img_list, partition)
 
     mult = not grayscale
     rdd = dataRDD.map(lambda x: load_from_S3(gs=grayscale, ak=awsak, sk=awssk, image_id=x, image_size=new_size,  bucket_name=main_bucket))
-    rdd = rdd.filter(lambda y: is_not_none(y[0]))
-    rdd = rdd.filter(lambda x: compare_images(incoming=incoming_im_resized, existing=x, same_size_MSE_cutoff=3000, diff_size_MSE_cutoff=5000))
+    rdd = rdd.filter(lambda y: is_same_size(incoming_im_resized[0], y[0]))
+    rdd = rdd.filter(lambda x: compare_ssim(incoming_im_resized[0], x[0], multichannel=mult) > 0.7)
+    #rdd = rdd.filter(lambda x: compare_images(incoming=incoming_im_resized, existing=x, same_size_MSE_cutoff=3000, diff_size_MSE_cutoff=5000))
     result = rdd.take(10)
     
     spark_time = time.time() - start_time
@@ -134,7 +154,7 @@ if __name__ == "__main__":
     dst = c.get_bucket(main_bucket, validate=False)
     k_src = Key(src)
     k_dst = Key(dst)
-
+    
     if result == []:
         print("\n\n\n\n\nNo match found, adding to the db...\n\n")
         print("Adding to the database..")
@@ -166,11 +186,11 @@ if __name__ == "__main__":
         tot_time = time.time() - tot_start_time
         stats_list.append(tot_time)
 
-        ssim = compare_ssim(incoming_im_resized[0], result[0][0])
+        ssim = compare_ssim(incoming_im_resized[0], result[0][0], multichannel=mult)
         stats_list.append(ssim)
 
         k_src.key = "{}{}.jpg".format(incoming_im_resized[3],incoming_img_id)
-        k_dst.key = "{}{}.jpg".format(result[0][?][3], result[0][?])
+        k_dst.key = "{}{}.jpg".format(result[0][3], result[0][2])
         url_orig = k_dst.generate_url(expires_in=0, query_auth=False)
         url_incoming = k_src.generate_url(expires_in=0, query_auth=False)
         stats_list.append(url_orig)
