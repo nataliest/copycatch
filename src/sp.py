@@ -5,7 +5,7 @@ import sys
 # custom modules
 #from image_compare import * 
 from  db_utils import *
-from  aws_s3_utils import * 
+#from  aws_s3_utils import * 
 
 # S3 imports
 import boto
@@ -19,7 +19,40 @@ from pyspark import SparkConf, SparkContext
 import redis
 
 from skimage.measure import compare_ssim 
+import boto
+from boto.s3.key import Key
+from boto.exception import S3ResponseError
+import io
+import PIL
+from PIL import Image
+import numpy as np
 
+def load_from_S3(image_id=None, image_size=(128,128), b=None, aws_connection=None, bucket_name=None, ak=None, sk=None, gs=False):
+    img = None
+    size = None
+    aws_connection = boto.connect_s3(aws_access_key_id=ak, aws_secret_access_key=sk)
+
+    b = aws_connection.get_bucket(bucket_name, validate=False)
+    # possible folders in the S3 bucket
+    prefix = ['', 'train/', 'test/', 'valid/']
+    for p in prefix:
+        k = Key(b)
+        k.key = '{}{}.jpg'.format(p, image_id)
+        try:        
+            s = k.get_contents_as_string()
+            img = Image.open(io.BytesIO(s))
+            size = img.size
+            img = np.asarray(img.resize(image_size))
+            print(np.shape(img))
+            if not gs and len(np.shape(img)) < 3:
+                return None, None, image_id
+            aws_connection.close()
+            return img, size, image_id
+        except S3ResponseError:
+            print(k.key, "not found")
+            pass
+    aws_connection.close()
+    return img, size, image_id
 def mse(imageA, imageB):
     # the 'Mean Squared Error' between the two images is the
     # sum of the squared difference between the two images;
@@ -35,10 +68,12 @@ def compare_images(
     existing=(None, (128,128),"img_id"),
     same_size_MSE_cutoff=0.6,
     diff_size_MSE_cutoff=1000):
-    
+    print("in compare")
+    print(type(incoming[0]))
+    print(type(existing[0]))    
     if not isinstance(existing[0], np.ndarray) :
         return False
-    
+    print("passed 1")    
     existing_im = incoming[0]
     incoming_im = existing[0]
     
@@ -51,6 +86,7 @@ def compare_images(
     incoming_im_array = incoming_im
     if np.shape(existing_im_array) != np.shape(incoming_im_array):
         return False      
+    print("passed 2")
     images_MSE = mse(existing_im_array, incoming_im_array)
     
     if same_size:
@@ -130,6 +166,18 @@ if __name__ == "__main__":
     if len(np.shape(incoming_im_resized[0])) < 3:
         grayscale = True
     timepoint = time.time() - start_time
+
+    print("img_list", img_list)    
+
+    test_list = []
+    for img in img_list:
+        im = load_from_S3(ak=awsak, sk=awssk, image_id=img, image_size=new_size,  bucket_name='open-images-bucket')
+        print(im)
+        test_list.append(im)
+
+    print(len(test_list))
+    for img in test_list:
+        print(compare_images(incoming=incoming_im_resized, existing=img))
     
     print("\n\nFetched incoming image in {} seconds\n\nStarting Spark.....\n\n\n".format(timepoint))
     start_time = time.time()
@@ -181,7 +229,7 @@ if __name__ == "__main__":
         k_dst.key = "valid/img{}.jpg".format(incoming_img_id)
         dst.copy_key(k_dst.key, src.name, k_src.key) 
         print("Updating tags database..")
-        update_db(incoming_img_tags, "img{}.jpg".format(incoming_img_id), r_tags)    
+        update_db(incoming_img_tags, "img{}".format(incoming_img_id), r_tags)    
     else:
         print("\n\n\n\n\nDuplicate found...\n\n")
 
