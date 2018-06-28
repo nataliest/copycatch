@@ -2,9 +2,10 @@ import redis
 from collections import OrderedDict
 
 def update_db(incoming_img_tags, img_id, r_tags):
+    r_tags.incr('size')
     for tag in incoming_img_tags:
         r_tags.sadd(tag, img_id)
-
+    
 def get_img_id_list(incoming_img_tags, r_tags, r_tag_levels):
     tags = list(sort_by_level(incoming_img_tags, r_tag_levels))
     

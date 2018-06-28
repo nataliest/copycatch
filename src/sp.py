@@ -115,9 +115,9 @@ if __name__ == "__main__":
     mult = not grayscale
     rdd = dataRDD.map(lambda x: load_from_S3(gs=grayscale, ak=awsak, sk=awssk, image_id=x, image_size=new_size,  bucket_name=main_bucket))
     rdd = rdd.filter(lambda y: is_not_none(y[0]))
-    rdd = rdd.filter(lambda x: compare_images(incoming_im_resized, x))
-    result = rdd.take(1)
-     
+    rdd = rdd.filter(lambda x: compare_images(incoming=incoming_im_resized, existing=x, same_size_MSE_cutoff=3000, diff_size_MSE_cutoff=5000))
+    result = rdd.take(10)
+       
     print("Spark finished in {} seconds".format(time.time() - start_time))
     
     if result == []:
@@ -136,6 +136,16 @@ if __name__ == "__main__":
         update_db(incoming_img_tags, "img{}".format(incoming_img_id), r_tags)    
     else:
         print("\n\n\n\n\nDuplicate found...\n\n")
+        r_stats = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=5)
+        # id => [tags as words, total num, num filtered, redis tag retr time, spark filter time, struct sim, url original, url new]
+        # get urls
+        # get structural similarity
+        # save tags
+        # save redis retrieval time
+        # save spark run time
+        # key = id
+        # print total images
+        # num images returned by tag filter
 
 
 
