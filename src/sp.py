@@ -89,19 +89,8 @@ if __name__ == "__main__":
     grayscale = False
     if len(np.shape(incoming_im_resized[0])) < 3:
         grayscale = True
-    timepoint = time.time() - start_time
+    timepoint = time.time() - start_time  
 
-    print("img_list", img_list)    
-
-    test_list = []
-    for img in img_list:
-        im = load_from_S3(ak=awsak, sk=awssk, image_id=img, image_size=new_size,  bucket_name='open-images-bucket')
-        print(im)
-        test_list.append(im)
-
-    print(len(test_list))
-    for img in test_list:
-        print(compare_images(incoming=incoming_im_resized, existing=img))
     
     print("\n\nFetched incoming image in {} seconds\n\nStarting Spark.....\n\n\n".format(timepoint))
     start_time = time.time()
