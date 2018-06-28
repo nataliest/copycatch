@@ -1,7 +1,13 @@
-# CopyCatch
+# CopyCatcher - efficient copy finder for large databases
 
 Insight Data Engineering Project
 
-Data:
+CopyCatcher aims to solve:
+- file duplication problem
+- copyright infringement problem
+
+After filtering almost two million images by tags in under a second, the app performs MSE-error calculation on the filtered images and the incoming image in parallel using Spark. The image metadata is stored in Redis.
+
+Dataset:
 Open Images Dataset: ~600GB of images
  
