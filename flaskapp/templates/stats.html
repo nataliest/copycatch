@@ -46,8 +46,10 @@
       font-size: 4em;
       font-weight: normal;
     }
-    .masthead h2 {
-      font-size: 1.7em;
+    .masthead h2.ui.header {
+      font-size: 2em;
+      margin-top: 1em;
+      margin-bottom: 0.5em;
       font-weight: normal;
     }
 
@@ -80,13 +82,31 @@
     }
 
     .footer.segment {
-      padding: 5em 0em;
+      padding: 2em 0em;
     }
 
     .secondary.pointing.menu .toc.item {
       display: none;
     }
+    
+    .masthead a {
+      color: #d9e778;
+    }
 
+    .masthead a:hover {
+      color: white;
+    }
+
+    .masthead table {
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .masthead td { 
+      height: 80px;
+      padding: 20px;
+    }
     @media only screen and (max-width: 700px) {
       .ui.fixed.menu {
         display: none !important;
@@ -184,18 +204,32 @@
         Results
       </h2>
       </div>
-                   <table class="ui unstackable table">
+                   <table class="ui unstackable fixed center aligned table">
                      <thead>
                        <tr>
-                         <th>Tag</th>
-			 <th>Label</th>
+                         <th>ID</th>
+			 <th>Labels</th>
+                         <th>Total Images</th>
+                         <th>Filtered Images</th>
+                         <th>Redis Tag Retrieval (seconds)</th>
+                         <th>Spark Image Processing (seconds)</th>
+                         <th>Total Time</th>
+                         <th>Copy Found/Not Found</th>
+                         <th>Structural Similarity</th>
                        </tr>
                      </thead>
                      <tbody>
                        {% for val in list_out %}
                        <tr>
-                         <td><a href="stats/{{val.Key[3:]}}">{{val.Key}}</a></td>
-			 <td>{{val.val}}</td>
+                         <td><a href="stats/{{val.Key}}">{{val.Key}}</a></td>
+			 <td>{{val.labels}}</td>
+                         <td>{{val.numtotal}}</td>
+                         <td>{{val.filtered}}</td>
+                         <td>{{val.redis}}</td>
+                         <td>{{val.spark}}</td>
+                         <td>{{val.total}}</td>
+                         <td>{{val.found}}</td>
+                         <td>{{val.ssim}}</td>
                        </tr>
                        {% endfor %}
                      </tbody>
@@ -203,6 +237,15 @@
 
 
   </div>
+<div class="ui inverted vertical footer segment">
+         <h5 class="ui horizontal white header divider">Designed and implemented by Natalie Lebedeva</h5>
+
+
+   <div class="ui center aligned container">
+        <p>Insight Data Science 2018 | Data Engineering Fellowship</p>
+   </div>   
+</div>
+
 </div>
     
 </body>
