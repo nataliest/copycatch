@@ -27,7 +27,7 @@
   <link rel="stylesheet" type="text/css" href="../static/js/dist/components/icon.css">
   <link rel="stylesheet" type="text/css" href="../static/js/dist/components/sidebar.css">
   <link rel="stylesheet" type="text/css" href="../static/js/dist/components/transition.css">
- 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
     <style type="text/css">
    .hidden.menu {
       display: none;
@@ -210,7 +210,7 @@
         <a class="item" href="\stats">Results</a>
         <a class="item">Technologies</a>
         <a class="item">Presentation</a>
-        <a class="item">About Me</a>
+        <a class="item" href="\about">About Me</a>
      </div>
     </div>
 
@@ -230,12 +230,19 @@
         atch </h1>
 
       <h2 class="ui inverted header">Efficient copy finder for large datasets.</h2>
+
+      <button class="ui huge inverted olive button" type="button" onclick="window.location.href='/github';">
+            GitHub Repo   
+      <i class="fa fa-github" ></i>
+      </button>
+ 
+
       <button class="ui huge inverted olive button" type="button" onclick="window.location.href='/stats';">
-             Display Results
+             View Results
       <i class="arrow circle right icon"></i>
       </button>
-
-    </div>
+ 
+   </div>
  </div>
 
 <!--  <div class="ui vertical stripe segment">
