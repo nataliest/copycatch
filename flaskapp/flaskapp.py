@@ -27,7 +27,7 @@ def mylink():
 
 @app.route('/about')
 def about_me():
-	img_link = "https://github.com/nataliest/copycatch/blob/master/flaskapp/assets/aboutme.JPG"
+	img_link = "https://raw.githubusercontent.com/nataliest/copycatch/master/flaskapp/assets/aboutme.JPG"
 	return render_template("about.html", img_link = img_link)
 
 @app.route('/stats/<img_id>')
