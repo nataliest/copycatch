@@ -5,6 +5,14 @@ import numpy as np
 import PIL
 from PIL import Image
 
+def is_not_none(arr):
+    return isinstance(arr, np.ndarray)
+
+def is_same_size(arr1, arr2):
+    if isinstance(arr1, np.ndarray) and isinstance(arr2, np.ndarray):
+        return np.shape(arr1) == np.shape(arr2)
+    else:
+        return False
 
 def mse(imageA, imageB):
     # the 'Mean Squared Error' between the two images is the
@@ -22,7 +30,7 @@ def compare_images(
     same_size_MSE_cutoff=0.6,
     diff_size_MSE_cutoff=1000):
     
-    if not isinstance(existing[0], np.ndarray) :
+    if not isinstance(existing[0], np.ndarray):
         return False
     
     existing_im = incoming[0]
