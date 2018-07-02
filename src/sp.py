@@ -40,7 +40,8 @@ def parse_arguments():
     return vars(args)
 
 
-def get_partition_size:
+def get_partition_size(num_ids):
+    partition = 1
     if num_ids < 10:
         partition = 2
     if num_ids > 100000:
@@ -53,6 +54,7 @@ def get_partition_size:
         partition = 50
     else:
         partition = 10
+    return partition
 
 if __name__ == "__main__":
 
@@ -80,16 +82,18 @@ if __name__ == "__main__":
     r_labels = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=4)    
     r_stats = redis.StrictRedis(host='redis-db.7ptpwl.ng.0001.use1.cache.amazonaws.com', port=6379, db=5)
 
-    incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id))
+#    incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id))
     # test
     if incoming_img_id[-2:] == 'wm':
         incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id[:-2]))
-   # incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id))
+    else:
+        incoming_img_tags = list(r_incoming_tags.smembers(incoming_img_id))
     print("\n\n\nGOT TAGS FOR INCOMING IMAGE:", incoming_img_id)
     tag_labels = ''
     for i in incoming_img_tags:
         tag_labels += r_labels.get(i) + ', '
-    tag_labels = [tag_labels[:-2]]
+        
+    tag_labels = tag_labels[:-2]
     print(tag_labels)
     print("\n\n\n")
    
@@ -161,7 +165,7 @@ if __name__ == "__main__":
         dst.copy_key(k_dst.key, src.name, k_src.key) 
         print("Updating tags database..")
         update_db(incoming_img_tags, "img{}".format(incoming_img_id), r_tags)  
-
+        sample_diff_img = load_from_S3(ak=awsak, sk=awssk, image_id=img_list[0], image_size=new_size,  bucket_name=main_bucket)
 
         stats_list = []
 
@@ -181,19 +185,18 @@ if __name__ == "__main__":
         
         stats_list.append("Not found")
 
-        ssim = compare_ssim(incoming_im_resized[0], result[0][0], multichannel=mult)
+        ssim = compare_ssim(incoming_im_resized[0], sample_diff_img[0], multichannel=mult)
         stats_list.append(str(round(ssim * 100, 2))+"%")
 
         k_src.key = "{}{}.jpg".format(incoming_im_resized[3],incoming_img_id)
-        k_dst.key = "{}{}.jpg".format(result[0][3], result[0][2])
+        k_dst.key = "{}{}.jpg".format(sample_diff_img[3], sample_diff_img[2])
         url_orig = k_dst.generate_url(expires_in=0, query_auth=False)
         url_incoming = k_src.generate_url(expires_in=0, query_auth=False)
         stats_list.append(url_orig)
         stats_list.append(url_incoming)
         print(stats_list)
-        stats_list = stats_list.reverse()
         for stat in stats_list:
-            r_stats.lpush(result[0][2], stat)
+            r_stats.rpush(sample_diff_img[2], stat)
 
     else:
         print("\n\n\n\n\nDuplicate found...\n\n")
@@ -225,10 +228,10 @@ if __name__ == "__main__":
         url_incoming = k_src.generate_url(expires_in=0, query_auth=False)
         stats_list.append(url_orig)
         stats_list.append(url_incoming)
-        print(stats_list)
-        stats_list = stats_list.reverse()
+        print(stats_list, incoming_im_resized[2])    
         for stat in stats_list:
-            r_stats.lpush(result[0][2], stat)
+            #r_stats.rpush(result[0][2], stat)
+            r_stats.rpush(incoming_im_resized[2], stat)
         # id => [tags as words, total num, num filtered, redis tag retr time, spark filter time, tot time, struct sim, url original, url new]
         # get urls
         # get structural similarity
