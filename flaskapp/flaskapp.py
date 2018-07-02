@@ -18,7 +18,7 @@ def myppt():
 
 @app.route('/tech')
 def pipeline():
-	pipeline = "https://raw.githubusercontent.com/nataliest/copycatch/master/docs/CopyCatcher_pipeline.png"
+	pipeline = "https://raw.githubusercontent.com/nataliest/copycatch/master/docs/CopyCatch_pipeline.png"
 	return render_template("tech.html", pipeline=pipeline)
 
 @app.route('/linkedin')
