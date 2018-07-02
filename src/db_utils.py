@@ -37,43 +37,4 @@ def sort_by_level(tags, r_tag_levels):
    
     return res_list
 
-# def update_stats_db(db=r_stats,
-#                     labels=[], 
-#                     tot_size=0, 
-#                     num_filtered=0,
-#                     redis_time=0,
-#                     spark_time=0,
-#                     tot_time=0,
-#                     structural_similarity=0,
-#                     url_incoming='',
-#                     url_original=''):
-#     stats_list = []
-
-#     tag_labels = str(labels_list)
-#     stats_list.append(labels)
-
-#     total_img = r_tags.get('size')
-#     stats_list.append(tot_size)
-
-#     num_filtered = len(img_list)
-#     stats_list.append(num_filtered)
-
-#     stats_list.append(redis_time)
-#     stats_list.append(spark_time)
-
-#     tot_time = time.time() - tot_start_time
-#     stats_list.append(tot_time)
-
-#     ssim = compare_ssim(incoming_im_resized[0], result[0][0], multichannel=mult)
-#     stats_list.append(structural_similarity)
-
-#     k_src.key = "{}{}.jpg".format(incoming_im_resized[3],incoming_img_id)
-#     k_dst.key = "{}{}.jpg".format(result[0][3], result[0][2])
-#     url_orig = k_dst.generate_url(expires_in=0, query_auth=False)
-#     url_incoming = k_src.generate_url(expires_in=0, query_auth=False)
-#     stats_list.append(url_orig)
-#     stats_list.append(url_incoming)
-#     print(stats_list)
-#     for stat in stats_list:
-#         r_stats.lpush(result[0][2], stat)
 
