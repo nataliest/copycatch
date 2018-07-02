@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Semantic UI CDN</title>
+    <title>Results and Statistics</title>
 <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
@@ -49,7 +49,7 @@
     .masthead h2.ui.header {
       font-size: 2em;
       margin-top: 1em;
-      margin-bottom: 0.5em;
+      margin-bottom: 1em;
       font-weight: normal;
     }
 
@@ -103,6 +103,12 @@
       margin-right: auto;
     }
     
+    .masthead th {
+      height: 120px;
+      padding: 20px;
+      margin-bottom: 0.5em;
+    }
+
     .masthead td { 
       height: 80px;
       padding: 20px;
@@ -128,6 +134,7 @@
       .masthead h2 {
         margin-top: 0.5em;
         font-size: 1.5em;
+        margin-bottom: 1em;
       }
     }
 
@@ -166,24 +173,7 @@
 
 </head>
 <body>
-<!-- Following Menu -->
-<div class="ui large top fixed hidden menu">
-  <div class="ui container">
-    <a class="active item">Home</a>
-    <a class="item">Results</a>
-    <a class="item">Technologies</a>
-    <a class="item">About Me</a>
-    </div>
-</div>
-
-<!-- Sidebar Menu -->
-<div class="ui vertical inverted sidebar menu">
-  <a class="active item">Home</a>
-  <a class="item">Results</a>
-  <a class="item">Technologies</a>
-  <a class="item">About Me</a>
-
-</div>
+<!-- Page Contents -->
 <div class="pusher">
   <div class="ui inverted vertical masthead center aligned segment">
 
@@ -194,26 +184,27 @@
         </a>
         <a class="item" href="\">Home</a>
         <a class="active item" href="\stats">Results</a>
-        <a class="item">Technologies</a>
+        <a class="item" href="\tech">Technologies</a>
+        <a class="item" href="\ppt">Presentation</a>
         <a class="item" href="\about">About Me</a>
      </div>
     </div>
 
     <div class="ui text container">
       <h2 class="ui inverted header">
-        Results
+        Results: Most Recent Spark Jobs
       </h2>
       </div>
                    <table class="ui unstackable fixed center aligned table">
                      <thead>
                        <tr>
-                         <th>ID</th>
+                         <th>Uploaded Image ID</th>
 			 <th>Labels</th>
                          <th>Total Images</th>
                          <th>Filtered Images</th>
                          <th>Redis Tag Retrieval (seconds)</th>
                          <th>Spark Image Processing (seconds)</th>
-                         <th>Total Time</th>
+                         <th>Total Time (seconds)</th>
                          <th>Copy Found/Not Found</th>
                          <th>Structural Similarity</th>
                        </tr>

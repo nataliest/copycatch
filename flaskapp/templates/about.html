@@ -2,10 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Semantic UI CDN</title>
-<!--     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script> -->
+    <title>About Me</title>
   <link rel="stylesheet" type="text/css" href="../static/js/dist/components/reset.css">
   <link rel="stylesheet" type="text/css" href="../static/js/dist/components/site.css">
 
@@ -57,7 +54,7 @@
     }
     .ui.vertical.stripe h3 {
       font-size: 2em;
-      color: olive;
+      color: #d9e778;
     }
     .ui.vertical.stripe .button + h3,
     .ui.vertical.stripe p + h3 {
@@ -65,6 +62,10 @@
     }
     .ui.vertical.stripe .floated.image {
       clear: both;
+    }
+    .ui.bordered.images .image {
+      max-height: 50px;
+
     }
     .ui.vertical.stripe p {
       font-size: 1.33em;
@@ -79,6 +80,7 @@
     .quote.stripe.segment .grid .column {
       padding-top: 5em;
       padding-bottom: 5em;
+      padding-left: 10em;
     }
 
     .footer.segment {
@@ -166,26 +168,7 @@
 
 </head>
 <body>
-<!-- Following Menu -->
-<div class="ui large top fixed hidden menu">
-  <div class="ui container">
-    <a class="item">Home</a>
-    <a class="item">Results</a>
-    <a class="item">Technologies</a>
-    <a class="item">Presentation</a>
-    <a class="active item">About Me</a>
-    </div>
-</div>
-
-<!-- Sidebar Menu -->
-<div class="ui vertical inverted sidebar menu">
-  <a class="item">Home</a>
-  <a class="item">Results</a>
-  <a class="item">Technologies</a>
-  <a class="item">Presentation</a>
-  <a class="active item">About Me</a>
-
-</div>
+<!-- Page Contents -->
 <div class="pusher">
   <div class="ui inverted vertical masthead center aligned segment">
 
@@ -196,30 +179,23 @@
         </a>
         <a class="item" href="\">Home</a>
         <a class="item" href="\stats">Results</a>
-        <a class="item">Technologies</a>
-        <a class="item">Presentation</a>
-        <a class="active item">About Me</a>
+        <a class="item" href="\tech">Technologies</a>
+        <a class="item" href="\ppt">Presentation</a>
+        <a class="active item" href="\about">About Me</a>
      </div>
     </div>
 
-<!--    <div class="ui text container">
-      <h2 class="ui inverted header">
-        
-      </h2>
-    </div>
--->
 
-
-	<div class="ui vertical stripe segment">
+	<div class="ui vertical inverted stripe segment">
 	    <div class="ui middle aligned stackable grid container">
 	      <div class="row">
-	        <div class="five wide column">
+	        <div class="nine wide column">
 	          <h3 class="ui inverted header">Hi, I'm Natalie</h3>
 	          <p class="ui inverted">Prior to joining Insight Data Science as a Data Engineering Fellow, I spent 3 years at NYU learning about cybersecurity, machine learning, computer hardware and software, DSP, and other awesome things. </p>
 	          <p>I also play harp, piano, guitar, and compose music.</p>
 	        </div>
-	        <div class="nine wide right column">
-	          <img src="assets/images/wireframe/white-image.png" class="ui large bordered rounded image">
+	        <div class="five wide right column">
+	          <img src="{{ img_link }}" class="ui large bordered rounded image">
 	        </div>
 	      </div>
 	      <div class="row">

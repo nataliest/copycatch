@@ -10,15 +10,25 @@ def index():
 
 @app.route('/github')
 def mygit():
-    return redirect("https://github.com/nataliest/copycatch")
+	return redirect("https://github.com/nataliest/copycatch")
+
+@app.route('/ppt')
+def myppt():
+	return redirect("https://docs.google.com/presentation/d/10VAHEpHDFsiSNJHW4r9R7T4DvutFJHCB0-IHHuC_ksk/edit?usp=sharing")
+
+@app.route('/tech')
+def pipeline():
+	pipeline = "https://raw.githubusercontent.com/nataliest/copycatch/master/docs/CopyCatcher_pipeline.png"
+	return render_template("tech.html", pipeline=pipeline)
 
 @app.route('/linkedin')
 def mylink():
-    return redirect("https://www.linkedin.com/in/natalie-lebedeva/")
+	return redirect("https://www.linkedin.com/in/natalie-lebedeva/")
 
 @app.route('/about')
 def about_me():
-	return render_template("about.html")
+	img_link = "https://media.licdn.com/dms/image/C4D03AQEKHQYHvTQx1g/profile-displayphoto-shrink_200_200/0?e=1536192000&v=beta&t=eQYNszYu0G5YsgGCs6iOziHQvIGD_oPhaGdqzkVE-fk"
+	return render_template("about.html", img_link = img_link)
 
 @app.route('/stats/<img_id>')
 def display_detailed_info(img_id):
