@@ -56,7 +56,8 @@
     }
     .ui.vertical.stripe h3 {
       font-size: 2em;
-    }
+      color: #d9e778;
+   }
     .ui.vertical.stripe .button + h3,
     .ui.vertical.stripe p + h3 {
       margin-top: 3em;
@@ -98,12 +99,20 @@
     }
 
     .masthead table {
+      font-size: 20px;
+      margin-top: 2em;
+      margin-bottom: 50px;
       width: 80%;
       margin-left: auto;
       margin-right: auto;
     }
-    
+     .masthead th {
+      font-size: 1em; 
+      height: 80px;
+    }
+   
     .masthead td { 
+      font-size: 1em;
       height: 80px;
       padding: 20px;
     }
@@ -212,10 +221,10 @@
 	    <div class="ui middle aligned stackable grid container">
 	      <div class="row">
                 <div class="eight wide column">
-                  <h3 class="ui inverted header">Existing image</h3>
+                  <h2 class="ui inverted header">Existing image</h2>
                 </div>
                 <div class="eight wide right column">
-                  <h3 class="ui inverted header">Uploaded image</h3>
+                  <h2 class="ui inverted header">Uploaded image</h2>
                 </div>
               </div>
               <div class="row">
@@ -226,8 +235,18 @@
                 <img src="{{ json_out.url_incom }}" class="ui large bordered top aligned rounded image">
 	        </div>
 	      </div>
+              <div class="row">
+                <div class="eight wide column">
+                  <h3 class="ui inverted header">Match {{json_out.found}}</h3>
+                </div>
+                <div class="eight wide right column">
+                  <h3 class="ui inverted header">Structural Similarity: {{json_out.ssim}}</h3>
+                </div>
+              </div>
 	    </div>
-    </div> 
+
+
+	    </div>
 
 
 
@@ -235,27 +254,17 @@
                      <thead>
                        <tr>
                          <th>Uploaded Image ID</th>
-						 <th>Labels</th>
+			 <th>Labels</th>
                          <th>Total Images</th>
                          <th>Filtered Images</th>
-                         <th>Redis Tag Retrieval (seconds)</th>
-                         <th>Spark Image Processing (seconds)</th>
-                         <th>Total Time (seconds)</th>
-                         <th>Copy Found/Not Found</th>
-                         <th>Structural Similarity</th>
                        </tr>
                      </thead>
                      <tbody>
                        <tr>
                          <td><a href="stats/{{json_out.key}}">{{json_out.key}}</a></td>
-			 			 <td>{{json_out.labels}}</td>
+			 <td>{{json_out.labels}}</td>
                          <td>{{json_out.numtotal}}</td>
                          <td>{{json_out.filtered}}</td>
-                         <td>{{json_out.redis}}</td>
-                         <td>{{json_out.spark}}</td>
-                         <td>{{json_out.total}}</td>
-                         <td>{{json_out.found}}</td>
-                         <td>{{json_out.ssim}}</td>
                        </tr>
                        
                      </tbody>
