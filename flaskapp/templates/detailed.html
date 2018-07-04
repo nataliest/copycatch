@@ -99,7 +99,8 @@
     }
 
     .masthead table {
-      font-size: 20px;
+      font-size: 25px;
+      line-height: 1.5; 
       margin-top: 2em;
       margin-bottom: 50px;
       width: 80%;
@@ -109,7 +110,8 @@
      .masthead th {
       font-size: 1em; 
       height: 80px;
-    }
+      padding: 20px;
+   }
    
     .masthead td { 
       font-size: 1em;
@@ -213,12 +215,16 @@
 
     <div class="ui text container">
       <h2 class="ui inverted header">
-        Detailed Results for {{ json_out.key }}.jpg
+        Detailed Results
       </h2>
     </div>
 
     <div class="ui vertical stripe segment">
-	    <div class="ui middle aligned stackable grid container">
+	         <h3 class="ui inverted header">
+        Match {{json_out.found}}
+      </h3>
+
+              <div class="ui middle aligned stackable grid container">
 	      <div class="row">
                 <div class="eight wide column">
                   <h2 class="ui inverted header">Existing image</h2>
@@ -235,17 +241,9 @@
                 <img src="{{ json_out.url_incom }}" class="ui large bordered top aligned rounded image">
 	        </div>
 	      </div>
-              <div class="row">
-                <div class="eight wide column">
-                  <h3 class="ui inverted header">Match {{json_out.found}}</h3>
-                </div>
-                <div class="eight wide right column">
-                  <h3 class="ui inverted header">Structural Similarity: {{json_out.ssim}}</h3>
-                </div>
-              </div>
 	    </div>
 
-
+            <h3 class="ui inverted header">Structural Similarity: {{json_out.ssim}}</h3>
 	    </div>
 
 
@@ -255,8 +253,8 @@
                        <tr>
                          <th>Uploaded Image ID</th>
 			 <th>Labels</th>
-                         <th>Total Images</th>
-                         <th>Filtered Images</th>
+                         <th>Number of Total Images in the Database</th>
+                         <th>Number of Filtered Images</th>
                        </tr>
                      </thead>
                      <tbody>
