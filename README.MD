@@ -2,7 +2,7 @@
 
 Insight Data Engineering Project. <br>
 The UI is temporarily displayed on my personal website: <br>
-<a target="_blank" rel="noopener noreferrer" href="http://nataliest.com">nataliest.com</a>
+<a href="http://nataliest.com">nataliest.com</a> (opens in the same tab, sorry about that)
 
 CopyCatch aims to solve:
 - copyright infringement problem
