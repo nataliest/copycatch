@@ -2,7 +2,7 @@
 
 Insight Data Engineering Project
 The UI is temporarily displayed on my personal website: <br>
-<a href="nataliest.com">nataliest.com</a>
+<a href="http://nataliest.com">nataliest.com</a>
 
 CopyCatch aims to solve:
 - copyright infringement problem
