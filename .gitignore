@@ -1,3 +1,4 @@
 *.pyc
 *.p
-
+./flaskapp/static/js/dist
+./assets
