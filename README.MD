@@ -1,4 +1,4 @@
-# CopyCatcher - efficient copy finder for large databases
+# CopyCatch - efficient copy finder for large databases
 
 Insight Data Engineering Project
 The UI is temporarily displayed on my personal website:
