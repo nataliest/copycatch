@@ -1,6 +1,6 @@
 # CopyCatch - efficient copy finder for large databases
 
-Insight Data Engineering Project
+Insight Data Engineering Project. <br>
 The UI is temporarily displayed on my personal website: <br>
 <a href="http://nataliest.com">nataliest.com</a>
 
@@ -8,7 +8,7 @@ CopyCatch aims to solve:
 - copyright infringement problem
 - file duplication problem
 
-After filtering almost two million images by tags in under a second, the app performs MSE-error calculation and Structural Similarity comparison on the filtered images and the incoming image in parallel using Spark. 
+After filtering almost two million images by tags in under a second, the app performs MSE-error calculation and structural similarity comparison on the filtered images and the incoming image in parallel using Spark. <br>
 The image metadata is stored in Redis.
 
 The results displayed on the website were obtained using 6 worker nodes and 18 executors 2 cores each.
@@ -16,6 +16,6 @@ The results displayed on the website were obtained using 6 worker nodes and 18 e
 <img src="./docs/CopyCatch_pipeline.png" alt="pipeline_pp">
 
 Dataset:
-Open Images Dataset: ~600GB of images with tags.
+Open Images Dataset: ~600GB of images with tags. <br>
 The dataset csv metadata parsing scripts are not included.
  
