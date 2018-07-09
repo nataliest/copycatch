@@ -6,8 +6,6 @@ import PIL
 from PIL import Image
 
 
-
-
 def is_not_none(arr):
     return isinstance(arr, np.ndarray)
 
@@ -16,14 +14,11 @@ def is_same_size(arr1, arr2):
         return np.shape(arr1) == np.shape(arr2)
 
 def mse(imageA, imageB):
-    # the 'Mean Squared Error' between the two images is the
-    # sum of the squared difference between the two images;
-    # NOTE: the two images must have the same dimension
-    print(np.size(imageA), np.size(imageB))
-    err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
-    err /= float(imageA.shape[0] * imageA.shape[1])
+
+    error = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+    error /= float(imageA.shape[0] * imageA.shape[1])
     # return the MSE, the lower the error, the more "similar" the two images are
-    return err
+    return error
 
 def compare_images(
     incoming=(None, (128,128),"img_id"), 
@@ -44,23 +39,20 @@ def compare_images(
 
     existing_im_array = existing_im
     incoming_im_array = incoming_im
+
     if np.shape(existing_im_array) != np.shape(incoming_im_array):
         return False      
     images_MSE = mse(existing_im_array, incoming_im_array)
     
     if same_size:
         if images_MSE < same_size_MSE_cutoff:
-            print("Same image")
             return True
         else:
-            print("Different image")
             return False
     else:
         if images_MSE < diff_size_MSE_cutoff:
-            print("Same image")
             return True
         else:
-            print("Different image")
             return False
 
 

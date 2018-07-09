@@ -7,7 +7,14 @@ import PIL
 from PIL import Image
 import numpy as np
 
-def load_from_S3(image_id=None, image_size=(128,128), b=None, aws_connection=None, bucket_name=None, ak=None, sk=None, gs=False):
+def load_from_S3(image_id=None, 
+                 image_size=(128,128), 
+                 b=None, 
+                 aws_connection=None, 
+                 bucket_name=None, 
+                 ak=None, 
+                 sk=None, 
+                 gs=False):
     img = None
     size = None
     aws_connection = boto.connect_s3(aws_access_key_id=ak, aws_secret_access_key=sk)
