@@ -93,7 +93,7 @@ class CopyCatch(object):
 
 
 
-    def get_incoming_image_tags_labels(self)
+    def get_incoming_image_tags_labels(self):
 
         if self.incoming_img_id[-2:] == 'wm':
 
@@ -142,12 +142,12 @@ class CopyCatch(object):
         conf.set("spark.driver.memory", "5000m")
 
         sc = SparkContext(conf = conf)
-        sc.setLogLevel("ERROR")
+#        sc.setLogLevel("ERROR")
 
-        partition = get_partition_size(len(img_list))
+        partition = self.get_partition_size(len(self.img_list))
 
 
-        img_ids_rdd = sc.parallelize(img_list, partition)
+        img_ids_rdd = sc.parallelize(self.img_list, partition)
 
         img_rdd = img_ids_rdd.map\
         (lambda x: load_from_S3(gs=(not self.incoming_img_multichannel), 
@@ -165,7 +165,7 @@ class CopyCatch(object):
                                 multichannel=self.incoming_img_multichannel) > self.ssim_cutoff)
 
         mse_img_filter = ssim_img_filter.filter\
-        (lambda x: compare_images(incoming=incoming_im_resized, 
+        (lambda x: compare_images(incoming=self.incoming_im_resized, 
                                   existing=x, 
                                   same_size_MSE_cutoff=self.same_size_MSE_cutoff, 
                                   diff_size_MSE_cutoff=self.diff_size_MSE_cutoff))
@@ -185,7 +185,7 @@ class CopyCatch(object):
 
     def update_stats_db(self, redis_time, spark_time, tot_time):
 
-''' stats database: for frontend to read
+        """stats database: for frontend to read
 
     id => [tags as words, 
            total num, 
@@ -196,7 +196,7 @@ class CopyCatch(object):
            structural similarity, 
            url original, 
            url new]
-'''
+        """
 
         # connect to S3 bucket
         c = boto.connect_s3()
@@ -332,13 +332,57 @@ if __name__ == "__main__":
     print("\n\nFiltered image ids in {} seconds.\n\n\n".format(redis_time))
     start_time = time.time()
 
-    copycatcher.find_copy_spark()
+#    copycatcher.find_copy_spark()
 
+    conf = SparkConf()
+    conf.setMaster("spark://10.0.0.12:7077")
+    conf.setAppName("CopyCatch")
+    conf.set("spark.executor.memory", "1000m")
+    conf.set("spark.executor.cores", "2")
+    conf.set("spark.executor.instances", "15")
+    conf.set("spark.driver.memory", "5000m")
+
+    sc = SparkContext(conf = conf)
+    sc.setLogLevel("ERROR")
+
+    partition = copycatcher.get_partition_size(len(copycatcher.img_list))
+
+    img_list = copycatcher.img_list
+    mult = copycatcher.incoming_img_multichannel 
+    img_ids_rdd = sc.parallelize(img_list, partition)
+    incoming_im_resized = copycatcher.incoming_im_resized
+    ssim_cutoff = copycatcher.ssim_cutoff
+    diff_size_MSE_cutoff = copycatcher.diff_size_MSE_cutoff
+    same_size_MSE_cutoff = copycatcher.same_size_MSE_cutoff
+    img_rdd = img_ids_rdd.map\
+        (lambda x: load_from_S3(gs=(not mult),
+                                                         ak=awsak,
+                                                         sk=awssk,
+                                                         image_id=x,
+                                                         bucket_name=main_bucket))
+
+    img_rdd_null_filter = img_rdd.filter\
+        (lambda x: is_same_size(incoming_im_resized[0], x[0]))
+
+    ssim_img_filter = img_rdd_null_filter.filter\
+        (lambda x: compare_ssim(incoming_im_resized[0],
+                                x[0],
+                                multichannel=mult) > ssim_cutoff)
+
+    mse_img_filter = ssim_img_filter.filter\
+        (lambda x: compare_images(incoming=incoming_im_resized,
+                                  existing=x,
+                                  same_size_MSE_cutoff=same_size_MSE_cutoff,
+                                  diff_size_MSE_cutoff=diff_size_MSE_cutoff))
+
+
+    copycatcher.result = mse_img_filter.take(1)
+#    copycatcher.result = ssim_img_filter.take(1)
     spark_time = time.time() - start_time
     print("Spark finished in {} seconds".format(spark_time))
-
+    print(copycatcher.result)
     
-    copycatcher.update_stats_db()
+#    copycatcher.update_stats_db()
 
 
     
