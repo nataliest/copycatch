@@ -146,32 +146,41 @@ class CopyCatch(object):
 
         partition = self.get_partition_size(len(self.img_list))
 
-
-        img_ids_rdd = sc.parallelize(self.img_list, partition)
+        img_list = self.img_list
+        incoming_img_multichannel = self.incoming_img_multichannel
+        awsak = self.awsak
+        awssk = self.awssk
+        main_bucket = self.main_bucket
+        incoming_im_resized = self.incoming_im_resized
+        same_size_MSE_cutoff = self.same_size_MSE_cutoff
+        diff_size_MSE_cutoff = self.diff_size_MSE_cutoff
+        ssim_cutoff = self.ssim_cutoff
+        img_ids_rdd = sc.parallelize(img_list, partition)
 
         img_rdd = img_ids_rdd.map\
-        (lambda x: load_from_S3(gs=(not self.incoming_img_multichannel), 
-                                                         ak=self.awsak, 
-                                                         sk=self.awssk, 
+        (lambda x: load_from_S3(gs=(not incoming_img_multichannel), 
+                                                         ak=awsak, 
+                                                         sk=awssk, 
                                                          image_id=x,  
-                                                         bucket_name=self.main_bucket))
+                                                         bucket_name=main_bucket))
 
         img_rdd_null_filter = img_rdd.filter\
-        (lambda x: is_same_size(self.incoming_im_resized[0], x[0]))
+        (lambda x: is_same_size(incoming_im_resized[0], x[0]))
 
         ssim_img_filter = img_rdd_null_filter.filter\
-        (lambda x: compare_ssim(self.incoming_im_resized[0], 
+        (lambda x: compare_ssim(incoming_im_resized[0], 
                                 x[0], 
-                                multichannel=self.incoming_img_multichannel) > self.ssim_cutoff)
+                                multichannel=incoming_img_multichannel) > ssim_cutoff)
 
         mse_img_filter = ssim_img_filter.filter\
-        (lambda x: compare_images(incoming=self.incoming_im_resized, 
+        (lambda x: compare_images(incoming=incoming_im_resized, 
                                   existing=x, 
-                                  same_size_MSE_cutoff=self.same_size_MSE_cutoff, 
-                                  diff_size_MSE_cutoff=self.diff_size_MSE_cutoff))
+                                  same_size_MSE_cutoff=same_size_MSE_cutoff, 
+                                  diff_size_MSE_cutoff=diff_size_MSE_cutoff))
 
 
-        self.result = mse_img_filter.take(1)
+        result = mse_img_filter.take(1)
+        self.result = result
 
 
 
@@ -332,51 +341,51 @@ if __name__ == "__main__":
     print("\n\nFiltered image ids in {} seconds.\n\n\n".format(redis_time))
     start_time = time.time()
 
-#    copycatcher.find_copy_spark()
+    copycatcher.find_copy_spark()
 
-    conf = SparkConf()
-    conf.setMaster("spark://10.0.0.12:7077")
-    conf.setAppName("CopyCatch")
-    conf.set("spark.executor.memory", "1000m")
-    conf.set("spark.executor.cores", "2")
-    conf.set("spark.executor.instances", "15")
-    conf.set("spark.driver.memory", "5000m")
+    # conf = SparkConf()
+    # conf.setMaster("spark://10.0.0.12:7077")
+    # conf.setAppName("CopyCatch")
+    # conf.set("spark.executor.memory", "1000m")
+    # conf.set("spark.executor.cores", "2")
+    # conf.set("spark.executor.instances", "15")
+    # conf.set("spark.driver.memory", "5000m")
 
-    sc = SparkContext(conf = conf)
-    sc.setLogLevel("ERROR")
+    # sc = SparkContext(conf = conf)
+    # sc.setLogLevel("ERROR")
 
-    partition = copycatcher.get_partition_size(len(copycatcher.img_list))
+    # partition = copycatcher.get_partition_size(len(copycatcher.img_list))
 
-    img_list = copycatcher.img_list
-    mult = copycatcher.incoming_img_multichannel 
-    img_ids_rdd = sc.parallelize(img_list, partition)
-    incoming_im_resized = copycatcher.incoming_im_resized
-    ssim_cutoff = copycatcher.ssim_cutoff
-    diff_size_MSE_cutoff = copycatcher.diff_size_MSE_cutoff
-    same_size_MSE_cutoff = copycatcher.same_size_MSE_cutoff
-    img_rdd = img_ids_rdd.map\
-        (lambda x: load_from_S3(gs=(not mult),
-                                                         ak=awsak,
-                                                         sk=awssk,
-                                                         image_id=x,
-                                                         bucket_name=main_bucket))
+    # img_list = copycatcher.img_list
+    # mult = copycatcher.incoming_img_multichannel 
+    # img_ids_rdd = sc.parallelize(img_list, partition)
+    # incoming_im_resized = copycatcher.incoming_im_resized
+    # ssim_cutoff = copycatcher.ssim_cutoff
+    # diff_size_MSE_cutoff = copycatcher.diff_size_MSE_cutoff
+    # same_size_MSE_cutoff = copycatcher.same_size_MSE_cutoff
+    # img_rdd = img_ids_rdd.map\
+    #     (lambda x: load_from_S3(gs=(not mult),
+    #                                                      ak=awsak,
+    #                                                      sk=awssk,
+    #                                                      image_id=x,
+    #                                                      bucket_name=main_bucket))
 
-    img_rdd_null_filter = img_rdd.filter\
-        (lambda x: is_same_size(incoming_im_resized[0], x[0]))
+    # img_rdd_null_filter = img_rdd.filter\
+    #     (lambda x: is_same_size(incoming_im_resized[0], x[0]))
 
-    ssim_img_filter = img_rdd_null_filter.filter\
-        (lambda x: compare_ssim(incoming_im_resized[0],
-                                x[0],
-                                multichannel=mult) > ssim_cutoff)
+    # ssim_img_filter = img_rdd_null_filter.filter\
+    #     (lambda x: compare_ssim(incoming_im_resized[0],
+    #                             x[0],
+    #                             multichannel=mult) > ssim_cutoff)
 
-    mse_img_filter = ssim_img_filter.filter\
-        (lambda x: compare_images(incoming=incoming_im_resized,
-                                  existing=x,
-                                  same_size_MSE_cutoff=same_size_MSE_cutoff,
-                                  diff_size_MSE_cutoff=diff_size_MSE_cutoff))
+    # mse_img_filter = ssim_img_filter.filter\
+    #     (lambda x: compare_images(incoming=incoming_im_resized,
+    #                               existing=x,
+    #                               same_size_MSE_cutoff=same_size_MSE_cutoff,
+    #                               diff_size_MSE_cutoff=diff_size_MSE_cutoff))
 
 
-    copycatcher.result = mse_img_filter.take(1)
+    # copycatcher.result = mse_img_filter.take(1)
 #    copycatcher.result = ssim_img_filter.take(1)
     spark_time = time.time() - start_time
     print("Spark finished in {} seconds".format(spark_time))
