@@ -1,6 +1,5 @@
 from __future__ import print_function
-import argparse
-import time
+
 import sys
 # custom modules
 from image_compare import * 
@@ -19,9 +18,6 @@ from pyspark import SparkConf, SparkContext
 import redis
 
 from skimage.measure import compare_ssim 
-import boto
-from boto.s3.key import Key
-from boto.exception import S3ResponseError
 
 
 import numpy as np
