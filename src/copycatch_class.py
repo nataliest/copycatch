@@ -17,9 +17,8 @@ from pyspark import SparkConf, SparkContext
 # Redis imports
 import redis
 
+# other image processing helper packages
 from skimage.measure import compare_ssim 
-
-
 import numpy as np
 
 
@@ -284,3 +283,6 @@ class CopyCatch(object):
         else:
             partition = num_ids // 10
         return partition
+
+
+
