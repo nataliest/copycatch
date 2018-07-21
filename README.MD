@@ -18,4 +18,37 @@ The results displayed on the website were obtained using 6 worker nodes and 18 e
 Dataset:
 Open Images Dataset: ~600GB of images with tags. <br>
 The dataset csv metadata parsing scripts are not included.
+
+
+├── docs
+│   └── CopyCatch_pipeline.png
+├── flaskapp
+│   ├── assets
+│   │   └── aboutme.JPG
+│   ├── flaskapp.py
+│   ├── flaskapp.wsgi
+│   ├── static
+│   │   └── js
+│   │       └── dist
+│   │           ├── components
+│   └── templates
+│       ├── about.html
+│       ├── aboutme.JPG
+│       ├── detailed.html
+│       ├── index.html
+│       ├── stats.html
+│       └── tech.html
+├── src
+│   ├── aws_s3_utils.py
+│   ├── copycatch_class.py
+│   ├── db_utils.py
+│   ├── image_compare.py
+│   └── main_spark_submit.py
+└── tools
+    └── redis_db
+        ├── create_label_db4.py
+        ├── create_tag_db.py
+        ├── create_taglevel_db.py
+        ├── create_valid_id_tag_db.py
+
  
